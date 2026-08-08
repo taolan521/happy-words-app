@@ -1627,6 +1627,8 @@ body::after {
 </div>
 
 <!-- ===== 字母雨游戏 ===== -->
+<audio id="fallVoiceGood" preload="auto" src="https://lsbtta-cdn.laoshibang.com/tta/tts/2026-08-08/450d7e32-aca2-410b-b51b-8120209ada6e.mp3"></audio>
+<audio id="fallVoiceWrong" preload="auto" src="https://lsbtta-cdn.laoshibang.com/tta/tts/2026-08-08/a382dfff-b9b5-4f55-b54e-1c4aa360be9c.mp3"></audio>
 <div class="page" id="fallPage">
   <div class="nav-bar">
     <button class="nav-btn" onclick="switchPage('homePage')">← 首页</button>
@@ -1862,12 +1864,20 @@ function fallGameLoop() {
   fallState.animId = requestAnimationFrame(fallGameLoop);
 }
 
+function fallPlayVoice(type) {
+  try {
+    var el = document.getElementById(type === 'good' ? 'fallVoiceGood' : 'fallVoiceWrong');
+    if (el) { el.currentTime = 0; el.play().catch(function(){}); }
+  } catch(e) {}
+}
+
 function fallOnClick(letterObj) {
   if (!fallState || !fallState.running || !letterObj.active) return;
   letterObj.active = false;
 
   if (letterObj.ch.toUpperCase() === fallState.hiddenLetter.toUpperCase()) {
     letterObj.el.classList.add('correct');
+    fallPlayVoice('good');
     fallState.running = false;
     clearTimeout(fallState.spawnTimer);
     cancelAnimationFrame(fallState.animId);
@@ -1880,6 +1890,7 @@ function fallOnClick(letterObj) {
     }, 500);
   } else {
     letterObj.el.classList.add('wrong');
+    fallPlayVoice('wrong');
     fallState.combo = 0;
     fallState.lives--;
     fallUpdateHeader();
